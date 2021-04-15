@@ -1,0 +1,12 @@
+#!/bin/bash
+
+repo_container_folder="$(basename "$0")_repo_container"
+cd "$repo_container_folder"
+
+git init
+touch a
+git add a
+git commit -m "first commit"
+
+open-task.sh not_enough && exit 1 || exit 0
+
