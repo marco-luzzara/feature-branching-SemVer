@@ -17,5 +17,17 @@ function create_commit_with_file_content {
 }
 
 function setup_task {
-    
+    mkdir remote && cd "$_"
+
+    # remote repo
+    git init
+    create_commit
+
+    # local repo
+    cd ..
+    mkdir "local" && cd "$_"
+
+    git clone ../remote .
+
+    open-task.sh "$1" "$2"
 }

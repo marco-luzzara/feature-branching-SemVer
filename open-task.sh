@@ -1,6 +1,7 @@
 #!/bin/bash
 
 . "$(git --exec-path)/git-sh-setup"
+set -e
 
 test $(git branch --show-current) != "master" && die "you can only create a feature branch from master"
 test "$#" -ne 2 && die "specify both the task id and the release type (major|minor|patch)"
@@ -22,4 +23,5 @@ printf "$2" > .CI_NEXTRELEASE
 git add .CI_TASKID .CI_NEXTRELEASE
 git commit -m "branch feature/$1 started"
 
+# if it fails it could mean that feature branch has been pushed in the meanwhile
 git push origin "feature/$1"
