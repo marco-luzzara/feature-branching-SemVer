@@ -1,0 +1,28 @@
+#!/bin/bash
+
+. ../git_utils.sh
+
+mkdir remote && cd "$_"
+
+# remote repo
+git init
+create_commit
+
+# local repo
+cd ..
+mkdir "local" && cd "$_"
+
+git clone ../remote .
+
+printf "test" > test
+git add -N test
+open-task.sh 1234 patch
+
+test "$(git branch --show-current)" = "feature/1234"
+test -f .CI_TASKID
+test "$(cat .CI_TASKID)" = "1234"
+test -f .CI_NEXTRELEASE
+test "$(cat .CI_NEXTRELEASE)" = "patch"
+
+test "$(git log -1 --format="%s")" = "branch feature/1234 started"
+test "$(git diff --name-only)" = "test"

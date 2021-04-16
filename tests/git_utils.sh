@@ -15,3 +15,7 @@ function create_commit_with_file_content {
     git add "$1"
     git commit -m "commit n $(git rev-list --count $current_branch 2> /dev/null || echo 0) on branch $current_branch"
 }
+
+function setup_task {
+    
+}
