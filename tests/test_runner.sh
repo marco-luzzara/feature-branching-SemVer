@@ -15,10 +15,10 @@ done
 mkdir -p test_logs
 
 # run tests 
+export PATH="$PATH:$(pwd)/.."
+
 for test in *.test
 do
-	export PATH="$PATH:$(pwd)/.."
-
 	mkdir "${test}_repo_container" && cd "$_"
 	"../$test" &> "../test_logs/${test}" && display_test_results "$test" 1 || display_test_results "$test" 0
 	cd ..

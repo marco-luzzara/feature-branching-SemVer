@@ -5,4 +5,5 @@
 git init
 create_commit
 
-open-task.sh 1234a minor && exit 1 || exit 0
+open-task.sh 1234a minor 2>&1 | tee tmp.log
+test "$(cat tmp.log | tail -1)" = "task id must be a number"

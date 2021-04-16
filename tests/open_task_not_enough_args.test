@@ -5,4 +5,5 @@
 git init
 create_commit
 
-open-task.sh not_enough && exit 1 || exit 0
+open-task.sh not_enough 2>&1 | tee tmp.log
+test "$(cat tmp.log | tail -1)" = "specify both the task id and the release type (major|minor|patch)"
