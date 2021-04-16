@@ -1,0 +1,20 @@
+#!/bin/bash
+
+. ../git_utils.sh
+
+mkdir remote && cd "$_"
+
+# remote repo
+git init
+create_commit
+
+git branch feature/1234
+
+# local repo
+cd ..
+mkdir "local" && cd "$_"
+
+git clone --branch master --single-branch ../remote .
+
+open-task.sh 1234 minor 2>&1 | tee tmp.log
+test "$(cat tmp.log | tail -1)" = "branch feature/1234 already exists remotely"

@@ -12,7 +12,7 @@ test "$#" -ne 2 && die "specify both the task id and the release type (major|min
 
 # check if feature branch exists
 git rev-parse --verify "refs/heads/feature/$1" &> /dev/null && die "branch feature/$1 already exists locally"
-git fetch --dry-run origin "feature/$1" &> /dev/null && die "branch feature/$1 already exists on remote"
+git fetch --dry-run origin "feature/$1" &> /dev/null && die "branch feature/$1 already exists remotely"
 
 # first commit with branch info
 git checkout -b "feature/$1"
