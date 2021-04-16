@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 function create_commit {
     create_commit_with_file_content "$(date +%N)" ""
 }
