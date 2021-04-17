@@ -1,0 +1,75 @@
+#!/bin/bash
+
+function test_open_task_invalid_release_version {
+    git init
+    create_commit
+
+    open-task.sh 1234 1test_02 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "accepted release type: (major|minor|patch)"
+}
+
+function test_open_task_invalid_task_pattern {
+    git init
+    create_commit
+
+    open-task.sh 1234a minor 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "task id must be a number"
+}
+
+function test_open_task_not_enough_args {
+    git init
+    create_commit
+
+    open-task.sh not_enough 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "specify both the task id and the release type (major|minor|patch)"
+}
+
+function test_open_task_not_on_master {
+    git init
+    create_commit
+
+    git checkout -b test_branch
+
+    open-task.sh 1234 minor 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "you can only create a feature branch from master"
+}
+
+function test_open_task_feature_branch_already_exists_locally {
+    git init
+    create_commit
+
+    git branch feature/1234
+
+    open-task.sh 1234 minor 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "branch feature/1234 already exists locally"
+}
+
+function test_open_task_feature_branch_already_exists_remotely {
+    mkdir remote && cd "$_"
+
+    # remote repo
+    git init
+    create_commit
+
+    git branch feature/1234
+
+    # local repo
+    cd ..
+    mkdir "local" && cd "$_"
+
+    git clone --branch master --single-branch ../remote .
+
+    open-task.sh 1234 minor 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "branch feature/1234 already exists remotely"
+}
+
+function test_open_task_index_not_clear {
+    git init
+    create_commit
+
+    printf "testing" > a
+    git add a
+
+    open-task.sh 1234 minor 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "commit the index changes or restore them before opening a new task"
+}

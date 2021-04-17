@@ -1,0 +1,50 @@
+#!/bin/bash
+
+function test_close_task_branch_does_not_contain_release_version {
+    setup_task "1234" "minor"
+
+    rm .CI_NEXTRELEASE
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = ".CI_NEXTRELEASE does not exist. Cannot close a task without it"
+}
+
+function test_close_task_branch_does_not_contain_taskid {
+    setup_task "1234" "minor"
+
+    rm .CI_TASKID
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = ".CI_TASKID does not exist. Cannot close a task without it"
+}
+
+function test_close_task_index_not_clear {
+    setup_task "1234" "major"
+    printf "test" > test
+    git add test
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "commit the index changes or restore them before closing a task"
+}
+
+function test_close_task_not_a_feature_branch {
+    git init
+    create_commit
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "you can close a task only if you are on a feature branch"
+}
+
+function test_close_task_remote_master_is_ahead {
+    setup_task "1234" "minor"
+
+    # remote close-branch
+    cd ../remote
+
+    create_commit
+
+    cd ../local
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "master branch has new changes. Merge/Rebase before closing the feature"
+}

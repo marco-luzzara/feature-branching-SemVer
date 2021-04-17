@@ -19,14 +19,30 @@ export PATH="$PATH:$(pwd)/.."
 
 if (( $# == 0 ))
 then 
-	discovered_tests=( *.test )
+	discovered_test_files=( *.test )
 else
-	discovered_tests=( "$@" )
+	discovered_test_files=( "$@" )
 fi
 
-for test in ${discovered_tests[@]}
+. ./git_utils.sh
+set -e
+testDir=$(pwd)
+
+for testFile in ${discovered_test_files[@]}
 do
-	mkdir "${test}_repo_container" && cd "$_"
-	"../$test" &> "../test_logs/${test}" && display_test_results "$test" 1 || display_test_results "$test" 0
-	cd ..
+	. ./$testFile
+	tests=( $(compgen -A function test_) )
+
+	echo "
+	Found ${#tests[@]} tests in $testFile
+	"
+
+	for test in ${tests[@]}
+	do
+		mkdir "${test:5}_repo_container" && cd "$_"
+		"$test" &> "$testDir/test_logs/${test:5}" && display_test_results "${test:5}" 1 || display_test_results "${test:5}" 0
+		cd "$testDir"
+
+		unset -f $test
+	done
 done
