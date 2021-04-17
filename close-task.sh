@@ -15,8 +15,16 @@ taskId="$(cat .CI_TASKID)"
 nextRelease="$(cat .CI_NEXTRELEASE)"
 
 # check if master has new changes
-test "$(git ls-remote origin refs/heads/master | awk '{print $1}')" != "$(git rev-parse master)" && 
+test "$(git ls-remote origin refs/heads/master | awk '{print $1}')" != "$(git rev-parse refs/heads/master)" && 
     die "master branch has new changes. Merge/Rebase before closing the feature"
+
+# check if there are commit to push before closing a task
+test "$(git rev-parse refs/remotes/origin/feature/$taskId)" != "$(git rev-parse refs/heads/feature/$taskId)" &&
+    die "Push local commits before closing a task"
+
+# check if feature branch has new changes
+test "$(git ls-remote origin "refs/heads/feature/$taskId" | awk '{print $1}')" != "$(git rev-parse refs/heads/feature/$taskId)" &&
+    die "feature branch has new changes. Pull them before closing the feature"
 
 # clean up .CI files
 git rm .CI_TASKID

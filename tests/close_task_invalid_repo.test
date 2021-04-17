@@ -48,3 +48,27 @@ function test_close_task_remote_master_is_ahead {
     close-task.sh 2>&1 | tee tmp.log
     test "$(cat tmp.log | tail -1)" = "master branch has new changes. Merge/Rebase before closing the feature"
 }
+
+function test_close_task_remote_feature_branch_is_ahead {
+    setup_task "1234" "minor"
+
+    # remote close-branch
+    cd ../remote
+
+    git checkout feature/1234
+    create_commit
+
+    cd ../local
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "feature branch has new changes. Pull them before closing the feature"
+}
+
+function test_close_task_commit_not_pushed_yet {
+    setup_task "1234" "minor"
+
+    create_commit
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "Push local commits before closing a task"
+}

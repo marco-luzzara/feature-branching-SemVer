@@ -5,6 +5,7 @@ function test_close_task_success {
 
     create_commit
     create_commit
+    git push origin feature/1234
 
     close-task.sh "completed feature message"
 
@@ -19,6 +20,7 @@ function test_close_task_success_without_merge_message {
 
     create_commit
     create_commit
+    git push origin feature/1234
 
     close-task.sh
 
