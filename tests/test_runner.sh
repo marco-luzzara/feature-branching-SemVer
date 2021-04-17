@@ -17,7 +17,14 @@ mkdir -p test_logs
 # run tests 
 export PATH="$PATH:$(pwd)/.."
 
-for test in *.test
+if (( $# == 0 ))
+then 
+	discovered_tests=( *.test )
+else
+	discovered_tests=( "$@" )
+fi
+
+for test in ${discovered_tests[@]}
 do
 	mkdir "${test}_repo_container" && cd "$_"
 	"../$test" &> "../test_logs/${test}" && display_test_results "$test" 1 || display_test_results "$test" 0
