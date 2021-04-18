@@ -15,7 +15,7 @@ function test_close_task_branch_does_not_contain_taskid {
     rm .CI_TASKID
 
     close-task.sh 2>&1 | tee tmp.log
-    test "$(cat tmp.log | tail -1)" = ".CI_TASKID does not exist. Cannot close a task without it"
+    test "$(cat tmp.log | tail -1)" = ".CI_TASKID does not exist, cannot close a task without it. Make sure the branch is not already closed"
 }
 
 function test_close_task_index_not_clear {
@@ -38,11 +38,12 @@ function test_close_task_not_a_feature_branch {
 function test_close_task_remote_master_is_ahead {
     setup_task "1234" "minor"
 
-    # remote close-branch
+    # remote
     cd ../remote
 
     create_commit
 
+    # local
     cd ../local
 
     close-task.sh 2>&1 | tee tmp.log
@@ -52,12 +53,13 @@ function test_close_task_remote_master_is_ahead {
 function test_close_task_remote_feature_branch_is_ahead {
     setup_task "1234" "minor"
 
-    # remote close-branch
+    # remote
     cd ../remote
 
     git checkout feature/1234
     create_commit
 
+    # local
     cd ../local
 
     close-task.sh 2>&1 | tee tmp.log
@@ -71,4 +73,28 @@ function test_close_task_commit_not_pushed_yet {
 
     close-task.sh 2>&1 | tee tmp.log
     test "$(cat tmp.log | tail -1)" = "Push local commits before closing a task"
+}
+
+function test_close_task_branch_already_closed {
+    setup_task "1234" "minor"
+    create_commit
+    git push origin feature/1234
+
+    # another local repo
+    cd ..
+    mkdir local2 && cd "$_"
+    git clone ../remote .
+
+    git checkout feature/1234
+    close-task.sh
+
+    cd ../local
+    git checkout master
+    git pull origin master
+
+    git checkout feature/1234
+    git pull origin feature/1234
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = ".CI_TASKID does not exist, cannot close a task without it. Make sure the branch is not already closed"
 }

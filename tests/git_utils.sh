@@ -15,6 +15,20 @@ function create_commit_with_file_content {
 }
 
 function setup_task {
+    taskId="$1"
+    releaseVersion="$2"
+
+    setup_remote
+
+    # local repo
+    mkdir "local" && cd "$_"
+
+    git clone ../remote .
+
+    open-task.sh "$taskId" "$releaseVersion"
+}
+
+function setup_remote {
     mkdir remote && cd "$_"
 
     # remote repo
@@ -22,11 +36,5 @@ function setup_task {
     git config receive.denyCurrentBranch 'updateInstead'
     create_commit
 
-    # local repo
     cd ..
-    mkdir "local" && cd "$_"
-
-    git clone ../remote .
-
-    open-task.sh "$1" "$2"
 }

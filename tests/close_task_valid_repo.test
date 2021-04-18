@@ -37,3 +37,25 @@ function test_close_task_success_without_merge_message {
 
     assert_repo "1234" "minor" "Merged branch feature/1234"
 }
+
+function test_close_task_branch_merged_with_master {
+    setup_task "1234" "minor"
+    create_commit
+    git push origin feature/1234
+
+    # remote
+    cd ../remote
+    git checkout master
+    create_commit
+
+    cd ../local
+    git checkout master
+    git pull origin master
+    git checkout feature/1234
+    git merge -m "merged commit" master
+    git push origin feature/1234
+
+    close-task.sh
+
+    assert_repo "1234" "minor" "Merged branch feature/1234"
+}
