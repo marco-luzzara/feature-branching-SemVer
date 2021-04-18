@@ -6,10 +6,12 @@ set -e
 [[ ! $(git branch --show-current) =~ ^feature/[0-9]+$ ]] && die "you can close a task only if you are on a feature branch"
 
 # check if CI files exist
-test -f .CI_TASKID || die ".CI_TASKID does not exist, cannot close a task without it. Make sure the branch is not already closed"
-test -f .CI_NEXTRELEASE || die ".CI_NEXTRELEASE does not exist. Cannot close a task without it"
+test ! -f .CI_TASKID && die ".CI_TASKID does not exist, cannot close a task without it. Make sure the branch is not already closed"
+test ! -f .CI_NEXTRELEASE && die ".CI_NEXTRELEASE does not exist. Cannot close a task without it"
 
-[[ -n $(git diff --cached) ]] && die "commit the index changes or restore them before closing a task"
+# check if index is empty and no pending changes
+test -n "$(git diff --cached)" && die "commit the index changes or restore them before closing a task"
+test -n "$(git diff)" && die "commit, stash or discard pending changes before closing the task"
 
 taskId="$(cat .CI_TASKID)"
 nextRelease="$(cat .CI_NEXTRELEASE)"

@@ -59,3 +59,46 @@ function test_close_task_branch_merged_with_master {
 
     assert_repo "1234" "minor" "Merged branch feature/1234"
 }
+
+function test_close_task_branch_rebased_on_master {
+    setup_task "1234" "minor"
+    create_commit
+    git push origin feature/1234
+
+    # remote
+    cd ../remote
+    git checkout master
+    create_commit
+
+    cd ../local
+    git checkout master
+    git pull origin master
+    git checkout feature/1234
+    git rebase master
+    git push -f origin feature/1234
+
+    close-task.sh
+
+    assert_repo "1234" "minor" "Merged branch feature/1234"
+}
+
+function test_close_task_branch_merged_with_remote_feature {
+    setup_task "1234" "major"
+    create_commit
+    git push origin feature/1234
+
+    # remote
+    cd ../remote
+    git checkout feature/1234
+    create_commit
+
+    cd ../local
+    git checkout feature/1234
+    git fetch origin feature/1234
+    git merge -m "merged commit" origin/feature/1234
+    git push origin feature/1234
+
+    close-task.sh
+
+    assert_repo "1234" "major" "Merged branch feature/1234"
+}

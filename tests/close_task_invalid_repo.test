@@ -98,3 +98,14 @@ function test_close_task_branch_already_closed {
     close-task.sh 2>&1 | tee tmp.log
     test "$(cat tmp.log | tail -1)" = ".CI_TASKID does not exist, cannot close a task without it. Make sure the branch is not already closed"
 }
+
+function test_close_task_pending_changes {
+    setup_task "1234" "major"
+    create_commit_with_file_content "testfile" "mycontent"
+    git push origin feature/1234
+
+    printf " new changes" >> testfile
+
+    close-task.sh 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "commit, stash or discard pending changes before closing the task"
+}
