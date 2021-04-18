@@ -1,3 +1,5 @@
+#!/bin/bash
+
 function display_test_results {
 	if (( $2 == 1 ))
 	then 
@@ -25,24 +27,26 @@ else
 fi
 
 . ./git_utils.sh
-set -e
 testDir=$(pwd)
 
 for testFile in ${discovered_test_files[@]}
 do
-	. ./$testFile
-	tests=( $(compgen -A function test_) )
+	(
+		. ./$testFile
+		tests=( $(compgen -A function test_) )
 
-	echo "
-	Found ${#tests[@]} tests in $testFile
-	"
+		echo "
+		Found ${#tests[@]} tests in $testFile
+		"
 
-	for test in ${tests[@]}
-	do
-		mkdir "${test:5}_repo_container" && cd "$_"
-		"$test" &> "$testDir/test_logs/${test:5}" && display_test_results "${test:5}" 1 || display_test_results "${test:5}" 0
-		cd "$testDir"
-
-		unset -f $test
-	done
+		for test in ${tests[@]}
+		do
+			mkdir "${test:5}_repo_container" && cd "$_"
+			
+			(set -e ; "$test" &> "$testDir/test_logs/${test:5}" ;)
+			(($? == 0)) && display_test_results "${test:5}" 1 || display_test_results "${test:5}" 0
+			
+			cd "$testDir"
+		done
+	)
 done
