@@ -35,3 +35,5 @@ git commit -m "cleaned CI files"
 git checkout master
 (( $# == 1 )) && commit_description=$1 || commit_description="Merged branch feature/$taskId"
 git merge --no-ff -m "rif. #${taskId}:${nextRelease}:$commit_description" "feature/$taskId"
+
+git push origin "feature/$taskId" master

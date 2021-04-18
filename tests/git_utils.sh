@@ -19,6 +19,7 @@ function setup_task {
 
     # remote repo
     git init
+    git config receive.denyCurrentBranch 'updateInstead'
     create_commit
 
     # local repo

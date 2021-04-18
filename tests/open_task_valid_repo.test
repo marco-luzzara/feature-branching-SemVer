@@ -1,5 +1,20 @@
 #!/bin/bash
 
+function assert_repo {
+    taskId="$1"
+    releaseVersion="$2"
+
+    test "$(git branch --show-current)" = "feature/$taskId"
+    test -f .CI_TASKID
+    test "$(cat .CI_TASKID)" = "$taskId"
+    test -f .CI_NEXTRELEASE
+    test "$(cat .CI_NEXTRELEASE)" = "$releaseVersion"
+
+    test "$(git log -1 --format="%s")" = "branch feature/$taskId started"
+    test "$(git ls-remote origin refs/heads/feature/$taskId | awk '{print $1}')" = "$(git rev-list -1 "feature/$taskId")"
+    test "$(git ls-remote origin refs/heads/master | awk '{print $1}')" = "$(git rev-list -1 "feature/$taskId~1")"
+}
+
 function test_open_task_valid_repo {
     mkdir remote && cd "$_"
 
@@ -15,13 +30,7 @@ function test_open_task_valid_repo {
 
     open-task.sh 1234 minor
 
-    test "$(git branch --show-current)" = "feature/1234"
-    test -f .CI_TASKID
-    test "$(cat .CI_TASKID)" = "1234"
-    test -f .CI_NEXTRELEASE
-    test "$(cat .CI_NEXTRELEASE)" = "minor"
-
-    test "$(git log -1 --format="%s")" = "branch feature/1234 started"
+    assert_repo "1234" "minor"
 }
 
 function test_open_task_valid_repo_with_temp_changes {
@@ -41,12 +50,6 @@ function test_open_task_valid_repo_with_temp_changes {
     git add -N test
     open-task.sh 1234 patch
 
-    test "$(git branch --show-current)" = "feature/1234"
-    test -f .CI_TASKID
-    test "$(cat .CI_TASKID)" = "1234"
-    test -f .CI_NEXTRELEASE
-    test "$(cat .CI_NEXTRELEASE)" = "patch"
-
-    test "$(git log -1 --format="%s")" = "branch feature/1234 started"
+    assert_repo "1234" "patch"
     test "$(git diff --name-only)" = "test"
 }

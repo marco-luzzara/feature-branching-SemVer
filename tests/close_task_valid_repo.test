@@ -1,5 +1,19 @@
 #!/bin/bash
 
+function assert_repo {
+    taskId="$1"
+    releaseVersion="$2"
+    cmtMsg="$3"
+
+    test ! -f ".CI_TASKID"
+    test ! -f ".CI_NEXTRELEASE"
+    test "$(git rev-parse master^2)" = "$(git rev-parse "feature/$taskId")"
+    test "$(git log -1 --format="%s")" = "rif. #${taskId}:${releaseVersion}:${cmtMsg}"
+    git merge-base --is-ancestor "refs/heads/feature/$taskId" "refs/heads/master"
+    test "$(git ls-remote origin refs/heads/master | awk '{print $1}')" = "$(git rev-parse refs/heads/master)"
+    test "$(git ls-remote origin "refs/heads/feature/$taskId" | awk '{print $1}')" = "$(git rev-parse refs/heads/feature/$taskId)"
+}
+
 function test_close_task_success {
     setup_task "1234" "minor"
 
@@ -9,10 +23,7 @@ function test_close_task_success {
 
     close-task.sh "completed feature message"
 
-    test ! -f ".CI_TASKID"
-    test ! -f ".CI_NEXTRELEASE"
-    test "$(git rev-parse master^2)" = "$(git rev-parse feature/1234)"
-    test "$(git log -1 --format="%s")" = "rif. #1234:minor:completed feature message"
+    assert_repo "1234" "minor" "completed feature message"
 }
 
 function test_close_task_success_without_merge_message {
@@ -24,8 +35,5 @@ function test_close_task_success_without_merge_message {
 
     close-task.sh
 
-    test ! -f ".CI_TASKID"
-    test ! -f ".CI_NEXTRELEASE"
-    test "$(git rev-parse master^2)" = "$(git rev-parse feature/1234)"
-    test "$(git log -1 --format="%s")" = "rif. #1234:minor:Merged branch feature/1234"
+    assert_repo "1234" "minor" "Merged branch feature/1234"
 }
