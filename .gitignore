@@ -1,2 +1,3 @@
 tests/test_logs/
 tests/*repo_container/
+tests/test_report.txt
