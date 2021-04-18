@@ -102,3 +102,14 @@ function test_close_task_branch_merged_with_remote_feature {
 
     assert_repo "1234" "major" "Merged branch feature/1234"
 }
+
+function test_close_task_releaseVersion_changed {
+    setup_task "1234" "major"
+    create_commit
+    create_commit_with_file_content ".CI_NEXTRELEASE" "minor"
+    git push origin feature/1234
+
+    close-task.sh
+
+    assert_repo "1234" "minor" "Merged branch feature/1234"
+}
