@@ -82,12 +82,13 @@ Before closing a feature branch, the `.CI_` files are automatically deleted in a
 the *description* can be specified as an argument to the `close-task` command, otherwise the default one is used.
 
 ## Repo Validation 
-You can find all the tests in the *tests* folder: each `function` corresponds to a test, which basically sets up a repo and make some assertions after calling `open/close-task`. 
+You can find all the tests in the *tests* folder: each `function` whose name starts with *test_* corresponds to a test, which basically sets up a repo and make some assertions after calling `open/close-task`. 
 It is very possible to find some common situations there, but I invite you to create an issue if you encounter unexpected errors.
 
 ## Limits and future development
 This is not a flexible workflow at all, actually it is the product of a company need. There should be the possibility to configure much of the hard-coded strings, included the feature branches naming, the remote repo name and the commit messages.
-Moreover, there is space for (relatively) minor improvements like the history simplification.
+Moreover, there is space for (relatively) minor improvements like the history simplification and additional commands to revert an `open-task` for example.
+Not tested with Git bash for Windows, but I expect it to be not fully supported. 
 
 Feel free to contribute if you are interested in the project 😉
 
