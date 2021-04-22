@@ -15,6 +15,10 @@ test "$#" -ne 2 && die "specify both the task id and the release type (major|min
 git rev-parse --verify "refs/heads/feature/$1" &> /dev/null && die "branch feature/$1 already exists locally"
 git fetch --dry-run origin "feature/$1" &> /dev/null && die "branch feature/$1 already exists remotely"
 
+# check if local master is equal to remote master
+test "$(git ls-remote origin refs/heads/master | awk '{print $1}')" != "$(git rev-parse refs/heads/master)" && 
+    die "Remote master and local master points to different commits. Pull/push before opening a task"
+
 # first commit with branch info
 git checkout -b "feature/$1"
 printf "$1" > .CI_TASKID

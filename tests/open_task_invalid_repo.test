@@ -73,3 +73,46 @@ function test_open_task_index_not_clear {
     open-task.sh 1234 minor 2>&1 | tee tmp.log
     test "$(cat tmp.log | tail -1)" = "commit the index changes or restore them before opening a new task"
 }
+
+function test_open_task_local_commits_left_on_master {
+    mkdir remote && cd "$_"
+
+    # remote repo
+    git init
+    create_commit
+
+    # local repo
+    cd ..
+    mkdir "local" && cd "$_"
+
+    git clone ../remote .
+    create_commit
+
+    open-task.sh 1234 patch 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "Remote master and local master points to different commits. Pull/push before opening a task"
+}
+
+function test_open_task_remote_master_has_new_commit {
+    mkdir remote && cd "$_"
+
+    # remote repo
+    git init
+    create_commit
+
+    # local repo
+    cd ..
+    mkdir "local" && cd "$_"
+
+    git clone ../remote .
+
+    cd ../remote
+    # remote repo
+
+    create_commit
+
+    cd ../local
+    # local repo
+
+    open-task.sh 1234 patch 2>&1 | tee tmp.log
+    test "$(cat tmp.log | tail -1)" = "Remote master and local master points to different commits. Pull/push before opening a task"
+}
