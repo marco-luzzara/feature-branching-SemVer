@@ -18,6 +18,10 @@ The quickest way to extend git is by using aliases (local or global, your choice
   
       git config alias.close-task '! ./path_to_this_repo/close-task.sh'
 
+## Installation
+In case you prefer to make those aliases globally defined, there is the installation script in the `install` folder. Run:
+* `install.ps1` for Windows
+
 ## How does it work?
 Suppose you are on `master` and you need to work on the task 1234. This task requires the implementation of non-breaking functionalities, so the next release version is `minor`.
 Starting from a sample repo, like
@@ -88,7 +92,6 @@ It is very possible to find some common situations there, but I invite you to cr
 ## Limits and future development
 This is not a flexible workflow at all, actually it is the product of a company need. There should be the possibility to configure much of the hard-coded strings, included the feature branches naming, the remote repo name and the commit messages.
 Moreover, there is space for (relatively) minor improvements like the history simplification and additional commands to revert an `open-task` for example.
-Not tested with Git bash for Windows, but I expect it to be not fully supported. 
 
 Feel free to contribute if you are interested in the project 😉
 
