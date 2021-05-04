@@ -19,8 +19,9 @@ The quickest way to extend git is by using aliases (local or global, your choice
       git config alias.close-task '! ./path_to_this_repo/close-task.sh'
 
 ## Installation
-In case you prefer to make those aliases globally defined, there is the installation script in the `install` folder. Run:
+In case you prefer to make those aliases globally defined, there is an installation script in the `install` folder. Run:
 * `install.ps1` for Windows
+* `install.sh` for Linux
 
 ## How does it work?
 Suppose you are on `master` and you need to work on the task 1234. This task requires the implementation of non-breaking functionalities, so the next release version is `minor`.
